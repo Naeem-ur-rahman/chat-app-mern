@@ -10,8 +10,17 @@ const app = express();
 const port = process.env.PORT || 3001
 const databaseURL = process.env.DATABASE_URL;
 
-const server = app.listen(port, () => console.log(`Server Started at http://localhost:${port}`));
-mongoose
-    .connect(databaseURL)
+app.use(cors({
+    origin: [process.env.ORIGIN],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+}))
+
+app.use(cookieParser())
+app.use(express.json())
+
+mongoose.connect(databaseURL)
     .then(() => console.log("DB Connected Successfull."))
-    .catch((e) => console.log("Error is : ", e))
+    .catch((e) => console.log("Error is : ", e));
+
+const server = app.listen(port, () => console.log(`Server Started at http://localhost:${port}`));
