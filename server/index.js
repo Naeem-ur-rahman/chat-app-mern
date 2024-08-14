@@ -4,6 +4,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from "mongoose";
 
+import authRoutes from './routes/auth.js'
+
 dotenv.config();
 
 const app = express();
@@ -18,6 +20,8 @@ app.use(cors({
 
 app.use(cookieParser())
 app.use(express.json())
+
+app.use('/api/auth', authRoutes)
 
 mongoose.connect(databaseURL)
     .then(() => console.log("DB Connected Successfull."))
