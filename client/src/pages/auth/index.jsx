@@ -4,14 +4,74 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input"
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { apiClient } from "@/lib/api-client";
+import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/utils/constants";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/store";
 
 const Auth = () => {
+    const navigate = useNavigate();
+    const { setUserInfo } = useAppStore();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleLogin = () => { }
-    const handleSignup = () => { }
+    const validateSignup = () => {
+        if (!email.length) {
+            toast.error("Email Required")
+            return false
+        }
+        if (!password.length) {
+            toast.error("Password Required")
+            return false
+        }
+        if (confirmPassword !== password) {
+            toast.error("Confirm Password Should be same.")
+            return false
+        }
+        return true
+    }
+    const validateLogin = () => {
+        if (!email.length) {
+            toast.error("Email Required")
+            return false
+        }
+        if (!password.length) {
+            toast.error("Password Required")
+            return false
+        }
+        return true
+    }
+    const handleLogin = async () => {
+        if (validateLogin()) {
+            const responce = await apiClient.post(
+                LOGIN_ROUTE,
+                { email, password },
+                { withCredentials: true }
+            );
+            if (responce.data.user.id) {
+                setUserInfo(responce.data.user)
+                if (responce.data.user.profileSetup) navigate('/chat')
+                else navigate('/profile')
+            }
+            console.log(responce)
+        }
+    }
+    const handleSignup = async () => {
+        if (validateSignup()) {
+            const responce = await apiClient.post(
+                SIGNUP_ROUTE,
+                { email, password },
+                { withCredentials: true }
+            );
+            if (responce.status === 201) {
+                setUserInfo(responce.data.user)
+                navigate('/profile')
+            }
+            console.log(responce)
+        }
+    }
 
     return (
         <div className="h-[100vh] w-[100vw] flex justify-center items-center">
