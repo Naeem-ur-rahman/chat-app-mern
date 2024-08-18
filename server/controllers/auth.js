@@ -89,3 +89,33 @@ export const getUserInfo = async (req, res, next) => {
         return res.status(500).send("Internal Server Error");
     }
 }
+
+export const updateProfile = async (req, res, next) => {
+    try {
+        const { userId } = req;
+        const { firstName, lastName, color } = req.body;
+
+        if (!firstName || lastName || color) {
+            return res.status(400).send("FirstName LastName and color is required")
+        }
+        const userData = User.findByIdAndUpdate({
+            firstName,
+            lastName,
+            color,
+            profileSetup: true
+        }, { new: true, runValidators: true });
+
+        return await res.status(200).json({
+            id: user._id,
+            email: user.email,
+            profileSetup: user.profileSetup,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            image: user.image,
+            color: user.color,
+        })
+    } catch (error) {
+        console.log({ error })
+        return res.status(500).send("Internal Server Error");
+    }
+}
