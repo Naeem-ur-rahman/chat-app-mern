@@ -1,23 +1,64 @@
 import { useAppStore } from "@/store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from 'react-icons/io5'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { colors, getColor } from "@/lib/utils";
 import { FaTrash, FaPlus } from "react-icons/fa"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { apiClient } from "@/lib/api-client";
+import { UPDATE_PROFILE_ROUTE } from "@/utils/constants";
 
 const Profile = () => {
-    const navigate = useNavigate()
-    const { userInfo, setUserInfo } = useAppStore()
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const navigate = useNavigate();
+    const { userInfo, setUserInfo } = useAppStore();
+    const [firstName, setFirstName] = useState(userInfo.firstName || "");
+    const [lastName, setLastName] = useState(userInfo.lastName || "");
     const [selectedColor, setSelectedColor] = useState(0);
     const [image, setImage] = useState(null);
     const [hovered, setHovered] = useState(false);
 
-    const saveChanges = () => { }
+    useEffect(() => {
+        if (userInfo.profileSetup) {
+            setFirstName(userInfo.firstName);
+            setLastName(userInfo.lastName);
+            setSelectedColor(userInfo.color)
+        }
+    }, [userInfo]);
+
+    const validateProfileData = () => {
+        if (!firstName) {
+            toast.error("First Name is Required");
+            return false;
+        }
+
+        if (!lastName) {
+            toast.error("Last Name is Required");
+            return false;
+        }
+        return true;
+    }
+
+    const saveChanges = async () => {
+        if (validateProfileData()) {
+            try {
+                const response = await apiClient.post(UPDATE_PROFILE_ROUTE,
+                    { firstName, lastName, color: selectedColor },
+                    { withCredentials: true }
+                );
+                if (response.status === 200 && response.data) {
+                    setUserInfo({ ...response.data });
+                    toast.success("Profile Updated Successfully");
+                    navigate('/chat');
+                }
+            } catch (error) {
+                console.log({ error });
+            }
+        }
+    }
+
     return (
         <div className="bg-[#1b1c24] h-[100vh] flex items-center justify-center flex-col gap-10">
             <div className="flex flex-col gap-10 w-[80vw] md:w-max ">
@@ -36,9 +77,9 @@ const Profile = () => {
                                         <div className={`w-32 h-32 md:w-48 md:h-48 text-5xl border-[1px] rounded-full flex items-center justify-center ${getColor(selectedColor)}`}>
                                             {
                                                 firstName ?
-                                                    firstName.split('').shift()
+                                                    firstName?.split('').shift()
                                                     :
-                                                    userInfo.email.split('').shift().toUpperCase()
+                                                    userInfo.email?.split('').shift().toUpperCase()
                                             }
                                         </div>
                                 }
@@ -49,7 +90,6 @@ const Profile = () => {
                                         {image ? <FaTrash className="text-white cursor-pointer text-3xl" /> : <FaPlus className="text-white cursor-pointer text-3xl" />}
                                     </div>
                                 )}
-                            {/* <input type="text" /> */}
                         </div>
                         <div className="flex min-w-32 md:min-w-64 flex-col gap-5 text-white items-center justify-center">
                             <div className="w-full">
@@ -66,7 +106,7 @@ const Profile = () => {
                                     placeholder="First Name"
                                     type="text"
                                     onChange={e => setFirstName(e.target.value)}
-                                    value={firstName}
+                                    value={firstName || ""}
                                     className="rounded-lg p-4 bg-[#2c2e3b] border-none"
                                 />
                             </div>
@@ -75,7 +115,7 @@ const Profile = () => {
                                     placeholder="Last Name"
                                     type="text"
                                     onChange={e => setLastName(e.target.value)}
-                                    value={lastName}
+                                    value={lastName || ""}
                                     className="rounded-lg p-4 bg-[#2c2e3b] border-none"
                                 />
                             </div>

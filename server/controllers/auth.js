@@ -95,15 +95,25 @@ export const updateProfile = async (req, res, next) => {
         const { userId } = req;
         const { firstName, lastName, color } = req.body;
 
-        if (!firstName || lastName || color) {
+        if (!firstName || !lastName) {
             return res.status(400).send("FirstName LastName and color is required")
         }
-        const userData = User.findByIdAndUpdate({
+        const user = await User.findByIdAndUpdate({ _id: userId }, {
             firstName,
             lastName,
             color,
             profileSetup: true
         }, { new: true, runValidators: true });
+
+        console.log({
+            id: user._id,
+            email: user.email,
+            profileSetup: user.profileSetup,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            image: user.image,
+            color: user.color,
+        })
 
         return await res.status(200).json({
             id: user._id,
