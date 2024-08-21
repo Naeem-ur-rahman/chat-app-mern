@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
-import { ADD_PROFILE_IMAGE_ROUTE, HOST, UPDATE_PROFILE_ROUTE } from "@/utils/constants";
+import { ADD_PROFILE_IMAGE_ROUTE, HOST, REMOVE_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from "@/utils/constants";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -29,7 +29,6 @@ const Profile = () => {
         }
         if (userInfo.image) {
             const imageUrl = `${HOST}/${userInfo.image}`;
-            console.log("Image URL:", imageUrl); // Debugging line
             setImage(imageUrl);
         }
     }, [userInfo]);
@@ -86,7 +85,19 @@ const Profile = () => {
             }
         }
     }
-    const handleDeleteImage = async () => { }
+
+    const handleDeleteImage = async () => {
+        try {
+            const responce = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, { withCredentials: true });
+            if (responce.status === 200) {
+                setUserInfo({ ...userInfo, image: null });
+                toast.success("Image Removed SuccessFully.")
+                setImage(null);
+            }
+        } catch (error) {
+            console.log({ error })
+        }
+    }
 
     return (
         <div className="bg-[#1b1c24] h-[100vh] flex items-center justify-center flex-col gap-10">
