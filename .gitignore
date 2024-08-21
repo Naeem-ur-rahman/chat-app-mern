@@ -26,3 +26,5 @@ dist-ssr
 
 # By Naeem ur Rahman Sajid
 .env
+# Dont Sent the Upload Files
+server/uploads

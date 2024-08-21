@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
-import { ADD_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from "@/utils/constants";
+import { ADD_PROFILE_IMAGE_ROUTE, HOST, UPDATE_PROFILE_ROUTE } from "@/utils/constants";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -26,6 +26,11 @@ const Profile = () => {
             setFirstName(userInfo.firstName);
             setLastName(userInfo.lastName);
             setSelectedColor(userInfo.color)
+        }
+        if (userInfo.image) {
+            const imageUrl = `${HOST}/${userInfo.image}`;
+            console.log("Image URL:", imageUrl); // Debugging line
+            setImage(imageUrl);
         }
     }, [userInfo]);
 
@@ -65,16 +70,19 @@ const Profile = () => {
     }
 
     const handleImageChange = async (event) => {
-        const file = event.target.file;
+        const file = event.target.files[0];
+        console.log({ file })
         if (file) {
             const formData = new FormData();
-            formData.append("profile-img", file)
+            formData.append("profile-image", file)
             const responce = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE,
-                { formData },
+                formData,
                 { withCredentials: true });
             if (responce.status === 200 && responce.data.image) {
                 setUserInfo({ ...userInfo, image: responce.data.image })
                 toast.success("Image Added SuccessFully")
+            } else {
+                console.log({ responce })
             }
         }
     }

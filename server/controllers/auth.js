@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { compare } from "bcrypt";
+import { renameSync, unlinkSync } from 'fs'
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const createToken = (email, userId) => {
@@ -105,16 +106,6 @@ export const updateProfile = async (req, res, next) => {
             profileSetup: true
         }, { new: true, runValidators: true });
 
-        console.log({
-            id: user._id,
-            email: user.email,
-            profileSetup: user.profileSetup,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            image: user.image,
-            color: user.color,
-        })
-
         return await res.status(200).json({
             id: user._id,
             email: user.email,
@@ -124,6 +115,39 @@ export const updateProfile = async (req, res, next) => {
             image: user.image,
             color: user.color,
         })
+    } catch (error) {
+        console.log({ error })
+        return res.status(500).send("Internal Server Error");
+    }
+}
+
+export const addProfileImage = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send("File is Required!")
+        }
+
+        const date = Date.now();
+        let filename = 'uploads/profiles/' + date + req.file.originalname;
+        renameSync(req.file.path, filename)
+        const user = await User.findByIdAndUpdate(
+            { _id: req.userId },
+            { image: filename },
+            { new: true, runValidators: true }
+        )
+
+        return await res.status(200).json({
+            image: user.image,
+        })
+    } catch (error) {
+        console.log({ error })
+        return res.status(500).send("Internal Server Error");
+    }
+}
+
+export const reomveProfileImage = async (req, res, next) => {
+    try {
+        
     } catch (error) {
         console.log({ error })
         return res.status(500).send("Internal Server Error");
