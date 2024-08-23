@@ -5,10 +5,11 @@ import { toast } from "sonner";
 import ContactsContainer from "./contacts-container";
 // import EmptyChatContainer from "./empty-chat-container";
 import ChatContainer from "./chat-container";
+import EmptyChatContainer from "./empty-chat-container";
 
 const Chat = () => {
     const navigate = useNavigate();
-    const { userInfo } = useAppStore();
+    const { userInfo, selectedChatType } = useAppStore();
     useEffect(() => {
         if (!userInfo.profileSetup) {
             toast("Please Setup Profile to continue.")
@@ -18,8 +19,12 @@ const Chat = () => {
     return (
         <div className="flex h-[100vh] text-white overflow-hidden ">
             <ContactsContainer />
-            {/* <EmptyChatContainer /> */}
-            <ChatContainer />
+            {
+                selectedChatType === undefined ?
+                    <EmptyChatContainer />
+                    :
+                    <ChatContainer />
+            }
         </div>
     );
 }
