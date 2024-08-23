@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from "mongoose";
 
 import authRoutes from './routes/auth.js'
+import contactsRoutes from './routes/contacts.js'
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)
+app.use('/api/contacts', contactsRoutes)
 
 mongoose.connect(databaseURL)
     .then(() => console.log("DB Connected Successfull."))
