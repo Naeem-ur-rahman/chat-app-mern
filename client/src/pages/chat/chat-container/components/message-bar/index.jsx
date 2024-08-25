@@ -1,13 +1,19 @@
+import { useSocket } from "@/context/SocketContext";
+import { useAppStore } from "@/store";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from 'react-icons/gr'
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
+import { toast } from "sonner";
 
 const MessageBar = () => {
     const emojiRef = useRef();
     const [message, setMessage] = useState("");
     const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+
+    const { selectedChatType, selectedChatData, userInfo } = useAppStore()
+    const socket = useSocket();
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -25,8 +31,28 @@ const MessageBar = () => {
         setMessage((msg) => msg + emoji.emoji);
     }
 
-    const handleSendMessage = async () => {
+    const validateMessage = () => {
 
+    }
+
+    const handleSendMessage = async () => {
+        if (!message.length) {
+            // toast.error("Enter Message")
+            return
+        }
+
+        if (socket && selectedChatType === 'contact') {
+            socket.emit("sendMessage", {
+                sender: userInfo.id,
+                recipient: selectedChatData._id,
+                content: message,
+                messageType: 'text',
+                fileUrl: undefined,
+            });
+            setMessage('')
+        } else {
+            console.error('Socket is not connected or selectedChatType is not "contact".');
+        }
     }
 
     return (
