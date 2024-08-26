@@ -3,11 +3,11 @@ import { useAppStore } from "@/store";
 import { GET_ALL_MESSAGES_ROUTE } from "@/utils/constants";
 import moment from "moment";
 import { useEffect, useRef } from "react";
+import "./scrollbar.css"
 
 const MessageContainer = () => {
     const scrollRef = useRef();
     const { selectedChatType, selectedChatData, selectedChatMessages, setSelectedChatMessages } = useAppStore()
-
 
     useEffect(() => {
         const getMessages = async () => {
@@ -73,7 +73,11 @@ const MessageContainer = () => {
     )
 
     return (
-        <div className="flex-1 overflow-y-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lg:w[70vw] xl:w-[80vw] w-full">
+        <div className="
+        flex-1 overflow-y-auto p-4 px-8 md:w-[65vw] lg:w[70vw] xl:w-[80vw] w-full
+        scrollbar
+        "
+        >
             {renderMessages()}
             <div ref={scrollRef} />
         </div>

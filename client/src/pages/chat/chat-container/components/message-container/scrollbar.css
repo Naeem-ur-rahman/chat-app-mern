@@ -1,0 +1,18 @@
+/* width */
+.scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Track */
+.scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 5px;
+}
+
+/* Handle */
+.scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .16);
+    border-radius: 24px;
+    max-height: 200px;
+    /* Control the thumb height */
+}
