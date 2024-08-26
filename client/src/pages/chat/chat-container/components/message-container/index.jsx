@@ -1,10 +1,32 @@
+import { apiClient } from "@/lib/api-client";
 import { useAppStore } from "@/store";
+import { GET_ALL_MESSAGES_ROUTE } from "@/utils/constants";
 import moment from "moment";
 import { useEffect, useRef } from "react";
 
 const MessageContainer = () => {
     const scrollRef = useRef();
-    const { selectedChatType, selectedChatData, selectedChatMessages, userInfo } = useAppStore()
+    const { selectedChatType, selectedChatData, selectedChatMessages, setSelectedChatMessages } = useAppStore()
+
+
+    useEffect(() => {
+        const getMessages = async () => {
+            try {
+                const responce = await apiClient.post(GET_ALL_MESSAGES_ROUTE,
+                    { id: selectedChatData._id },
+                    { withCredentials: true }
+                );
+                if (responce.status === 200 && responce.data.messages) {
+                    setSelectedChatMessages(responce.data.messages)
+                }
+            } catch (error) {
+                console.log({ error })
+            }
+        }
+        if (selectedChatData._id) {
+            if (selectedChatType === 'contact') getMessages();
+        }
+    }, [selectedChatData, selectedChatType, setSelectedChatMessages])
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -14,7 +36,7 @@ const MessageContainer = () => {
 
     const renderMessages = () => {
         let lastDate = null;
-        return selectedChatMessages.map((message, index) => {
+        return selectedChatMessages?.map((message, index) => {
             const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
             const showDate = messageDate !== lastDate;
             lastDate = messageDate;
