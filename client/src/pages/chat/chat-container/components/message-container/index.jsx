@@ -3,7 +3,7 @@ import { useAppStore } from "@/store";
 import { GET_ALL_MESSAGES_ROUTE } from "@/utils/constants";
 import moment from "moment";
 import { useEffect, useRef } from "react";
-import "./scrollbar.css"
+import "@/assets/scrollbar.css";
 
 const MessageContainer = () => {
     const scrollRef = useRef();

@@ -36,7 +36,7 @@ export const searchContacts = async (req, res, next) => {
 
 export const getContactsForDMList = async (req, res, next) => {
     try {
-        const { userId } = req;
+        let { userId } = req;
 
         userId = new mongoose.Types.ObjectId(userId);
 
