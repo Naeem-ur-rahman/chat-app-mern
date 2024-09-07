@@ -31,7 +31,7 @@ export const uploadFile = async (req, res, next) => {
 
         const date = Date.now();
         let fileDir = `uploads/files/${date}`;
-        let fileName = `${fileDir}/${req.file.orignalname}`;
+        let fileName = `${fileDir}/${req.file.originalname}`;
         
         mkdirSync(fileDir, { recursive: true })
         renameSync(req.file.path, fileName)
