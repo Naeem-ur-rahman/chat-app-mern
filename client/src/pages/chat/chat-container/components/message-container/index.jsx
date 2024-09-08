@@ -2,14 +2,17 @@ import { apiClient } from "@/lib/api-client";
 import { useAppStore } from "@/store";
 import { GET_ALL_MESSAGES_ROUTE, HOST } from "@/utils/constants";
 import moment from "moment";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "@/assets/scrollbar.css";
 import { MdFolderZip } from 'react-icons/md';
 import { IoMdArrowRoundDown } from 'react-icons/io';
+import { IoCloseSharp } from "react-icons/io5";
 
 const MessageContainer = () => {
     const scrollRef = useRef();
     const { selectedChatType, selectedChatData, selectedChatMessages, setSelectedChatMessages } = useAppStore()
+    const [showImage, setShowImage] = useState(false);
+    const [imageURL, setImageURL] = useState(null);
 
     useEffect(() => {
         const getMessages = async () => {
@@ -91,8 +94,14 @@ const MessageContainer = () => {
                         } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}>
                         {
                             checkIfImage(message.fileUrl)
-                                ? (<div>
-                                    <img src={`${HOST}/${message.fileUrl}`} width={300} height={300} className="cursor-pointer" />
+                                ? (<div
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        setShowImage(true)
+                                        setImageURL(message.fileUrl)
+                                    }}
+                                >
+                                    <img src={`${HOST}/${message.fileUrl}`} width={300} height={300} />
                                 </div>)
                                 : (<div className="flex items-center justify-center gap-4">
                                     <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
@@ -125,6 +134,32 @@ const MessageContainer = () => {
         >
             {renderMessages()}
             <div ref={scrollRef} />
+            {showImage && (
+                <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
+                    <div>
+                        <img src={`${HOST}/${imageURL}`}
+                            className="h-[80vh] w-full bg-cover"
+                        />
+                    </div>
+                    <div className="flex gap-5 fixed top-0 mt-2">
+                        <button
+                            className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                            onClick={() => downloadFile(imageURL)}
+                        >
+                            <IoMdArrowRoundDown />
+                        </button>
+                        <button
+                            className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                            onClick={() => {
+                                setShowImage(false);
+                                setImageURL(null)
+                            }}
+                        >
+                            <IoCloseSharp />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
