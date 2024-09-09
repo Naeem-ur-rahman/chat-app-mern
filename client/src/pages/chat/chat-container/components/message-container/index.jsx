@@ -70,8 +70,6 @@ const MessageContainer = () => {
 
     const downloadFile = async (url) => {
         try {
-
-
             setIsDownloading(true)
             setFileDownloadProgress(0)
             const response = await apiClient.get(`${HOST}/${url}`,
