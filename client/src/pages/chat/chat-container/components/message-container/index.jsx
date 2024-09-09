@@ -7,10 +7,14 @@ import "@/assets/scrollbar.css";
 import { MdFolderZip } from 'react-icons/md';
 import { IoMdArrowRoundDown } from 'react-icons/io';
 import { IoCloseSharp } from "react-icons/io5";
+import { toast } from "sonner";
 
 const MessageContainer = () => {
     const scrollRef = useRef();
-    const { selectedChatType, selectedChatData, selectedChatMessages, setSelectedChatMessages } = useAppStore()
+    const { selectedChatType, selectedChatData, selectedChatMessages, setSelectedChatMessages,
+        setIsDownloading,
+        setFileDownloadProgress,
+    } = useAppStore()
     const [showImage, setShowImage] = useState(false);
     const [imageURL, setImageURL] = useState(null);
 
@@ -65,15 +69,37 @@ const MessageContainer = () => {
     }
 
     const downloadFile = async (url) => {
-        const response = await apiClient.get(`${HOST}/${url}`, { responseType: "blob" });
-        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = urlBlob;
-        link.setAttribute("download", url.split("/").pop());
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(urlBlob);
+        try {
+
+
+            setIsDownloading(true)
+            setFileDownloadProgress(0)
+            const response = await apiClient.get(`${HOST}/${url}`,
+                {
+                    responseType: "blob",
+                    onDownloadProgress: (data) => {
+                        const { loaded, total } = data;
+                        const percentCompleted = Math.round((loaded * 100) / total)
+                        setFileDownloadProgress(percentCompleted)
+                    }
+                }
+            );
+            const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = urlBlob;
+            link.setAttribute("download", url.split("/").pop());
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(urlBlob);
+            setIsDownloading(false)
+            setFileDownloadProgress(0)
+        } catch (error) {
+            setIsDownloading(false)
+            setFileDownloadProgress(0)
+            console.log(error)
+            toast.error(JSON.stringify(error.message))
+        }
     }
 
     const renderDMMessages = (message) => (
