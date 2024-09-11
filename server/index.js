@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import authRoutes from './routes/auth.js'
 import contactsRoutes from './routes/contacts.js'
 import messagesRoutes from './routes/messages.js'
+import channelRoutes from './routes/channel.js'
+
 import setupSocket from "./socket.js";
 
 dotenv.config();
@@ -30,6 +32,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/contacts', contactsRoutes)
 app.use('/api/messages', messagesRoutes)
+app.use('/api/channels', channelRoutes)
 
 mongoose.connect(databaseURL)
     .then(() => console.log("DB Connected Successfull."))

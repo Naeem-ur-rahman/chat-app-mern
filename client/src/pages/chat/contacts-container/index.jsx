@@ -10,7 +10,7 @@ import CreateChannel from "./components/create-channel";
 
 const ContactsContainer = () => {
 
-    const { setDirectMessagesContacts, directMessagesContacts } = useAppStore();
+    const { setDirectMessagesContacts, directMessagesContacts, channels } = useAppStore();
 
     useEffect(() => {
         const getContacts = async () => {
@@ -42,6 +42,9 @@ const ContactsContainer = () => {
                 <div className="flex items-center justify-between pr-10">
                     <Title text="Channels" />
                     <CreateChannel />
+                </div>
+                <div className="m-h-[30vh] overflow-y-auto scrollbar">
+                    <ContactList contacts={channels} isChannel={true} />
                 </div>
             </div>
             <ProfileInfo />
