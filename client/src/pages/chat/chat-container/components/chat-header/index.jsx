@@ -11,31 +11,35 @@ const ChatHeader = () => {
             <div className="flex gap-5 items-center">
                 <div className="flex gap-3 items-center justify-center">
                     <div className="w-12 h-12 relative">
-
-                        <Avatar className="w-12 h-12">
-                            {
-                                selectedChatData.image ?
-                                    <AvatarImage src={`${HOST}/${selectedChatData.image}`} alt="Profile" className="object-cover h-full w-full rounded-full bg-black" />
-                                    :
-                                    <div
-                                        className={`w-12 h-12 text-lg border-[1px] rounded-full flex items-center justify-center ${getColor(selectedChatData.color)}`}>
-                                        {
-                                            selectedChatData.firstName ?
-                                                selectedChatData.firstName?.split('').shift()
-                                                :
-                                                selectedChatData.email?.split('').shift().toUpperCase()
-                                        }
-                                    </div>
-                            }
-                        </Avatar>
+                        {
+                            selectedChatType === 'contact'
+                                ? <Avatar className="w-12 h-12">
+                                    {
+                                        selectedChatData.image ?
+                                            <AvatarImage src={`${HOST}/${selectedChatData.image}`} alt="Profile" className="object-cover h-full w-full rounded-full bg-black" />
+                                            :
+                                            <div
+                                                className={`w-12 h-12 text-lg border-[1px] rounded-full flex items-center justify-center ${getColor(selectedChatData.color)}`}>
+                                                {
+                                                    selectedChatData.firstName ?
+                                                        selectedChatData.firstName?.split('').shift()
+                                                        :
+                                                        selectedChatData.email?.split('').shift().toUpperCase()
+                                                }
+                                            </div>
+                                    }
+                                </Avatar>
+                                : <div className="bg-[#ffffff22] h-12 w-12 flex items-center justify-center rounded-full">#</div>
+                        }
                     </div>
                     <div className="flex flex-col">
                         {
-                            selectedChatType === 'contact' &&
-                                selectedChatData.firstName && selectedChatData.lastName ?
-                                `${selectedChatData.firstName} ${selectedChatData.lastName}`
-                                :
-                                selectedChatData.email
+                            selectedChatType === 'contact'
+                                ? selectedChatData.firstName && selectedChatData.lastName ?
+                                    `${selectedChatData.firstName} ${selectedChatData.lastName}`
+                                    :
+                                    selectedChatData.email
+                                : selectedChatData.name
                         }
                     </div>
                 </div>
