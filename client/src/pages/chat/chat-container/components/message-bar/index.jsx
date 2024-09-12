@@ -49,6 +49,15 @@ const MessageBar = () => {
                 fileUrl: undefined,
             });
             setMessage('')
+        } else if (socket && selectedChatType === 'channel') {
+            socket.emit("send-channel-message", {
+                sender: userInfo.id,
+                content: message,
+                messageType: 'text',
+                fileUrl: undefined,
+                channelId: selectedChatData._id,
+            });
+            setMessage('')
         } else {
             console.error('Socket is not connected or selectedChatType is not "contact".');
         }
@@ -84,6 +93,14 @@ const MessageBar = () => {
                             content: undefined,
                             messageType: 'file',
                             fileUrl: response.data.filePath,
+                        });
+                    } else if (socket && selectedChatType === 'channel') {
+                        socket.emit("send-channel-message", {
+                            sender: userInfo.id,
+                            content: undefined,
+                            messageType: 'file',
+                            fileUrl: response.data.filePath,
+                            channelId: selectedChatData._id,
                         });
                     }
                 } else {
