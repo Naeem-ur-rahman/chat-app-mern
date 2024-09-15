@@ -35,10 +35,7 @@ const MessageBar = () => {
     }
 
     const handleSendMessage = async () => {
-        if (!message.length) {
-            // toast.error("Enter Message")
-            return
-        }
+        if (message.trim() === "") return;
 
         if (socket && selectedChatType === 'contact') {
             socket.emit("sendMessage", {
@@ -62,6 +59,12 @@ const MessageBar = () => {
             console.error('Socket is not connected or selectedChatType is not "contact".');
         }
     }
+
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            handleSendMessage();
+        }
+    };
 
     const handleAttachmentClick = () => {
         if (fileInputRef.current) {
@@ -123,6 +126,7 @@ const MessageBar = () => {
                     placeholder="Enter Message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
                 <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all '
                     onClick={handleAttachmentClick}
@@ -137,7 +141,7 @@ const MessageBar = () => {
                     >
                         <RiEmojiStickerLine className="text-2xl" />
                     </button>
-                    <div className="absolute bottom-16 right-0" ref={emojiRef}>
+                    <div className="absolute bottom-16 right-1" ref={emojiRef}>
                         <EmojiPicker
                             theme="dark"
                             open={emojiPickerOpen}
@@ -150,6 +154,7 @@ const MessageBar = () => {
             <button
                 className='bg-[#8417ff] focus:border-none p-4 hover:bg-[#741bda] focus:bg-[#741bda]  focus:outline-none focus:text-white duration-300 transition-all'
                 onClick={handleSendMessage}
+
             >
                 <IoSend className="text-2xl" />
             </button>

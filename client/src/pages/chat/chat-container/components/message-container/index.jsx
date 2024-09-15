@@ -130,7 +130,7 @@ const MessageContainer = () => {
                 <div className={`${message.sender !== selectedChatData._id
                     ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                     : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                    } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}>
+                    } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words`}>
                     {message.content}
                 </div>
             )}
@@ -139,7 +139,7 @@ const MessageContainer = () => {
                     <div className={`${message.sender !== selectedChatData._id
                         ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                         : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                        } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}>
+                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words`}>
                         {
                             checkIfImage(message.fileUrl)
                                 ? (<div
@@ -181,7 +181,7 @@ const MessageContainer = () => {
                     <div className={`${message.sender._id === userInfo.id
                         ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                         : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                        } border inline-block p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
+                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
                         {message.content}
                     </div>
                 )}
@@ -191,7 +191,7 @@ const MessageContainer = () => {
                         <div className={`${message.sender._id === userInfo.id
                             ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                             : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                            } border inline-block p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
+                            } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
                             {
                                 checkIfImage(message.fileUrl)
                                     ? (<div
@@ -265,7 +265,7 @@ const MessageContainer = () => {
                 <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
                     <div>
                         <img src={`${HOST}/${imageURL}`}
-                            className="h-[80vh] w-full bg-cover"
+                            className="h-auto lg:h-[80vh] w-full bg-cover"
                         />
                     </div>
                     <div className="flex gap-5 fixed top-0 mt-2">

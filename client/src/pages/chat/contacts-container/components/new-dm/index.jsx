@@ -72,7 +72,7 @@ const NewDM = () => {
             </TooltipProvider>
 
             <Dialog open={openNewContactModal} onOpenChange={setOpenNewContactModal}>
-                <DialogContent className="bg-[#1c1d25] border-none text-white w-[400px] h-[400px] flex flex-col">
+                <DialogContent className="bg-[#1c1d25] border-none text-white w-[350px] h-[350px]  md:w-[400px] md:h-[400px] flex flex-col">
                     <DialogHeader>
                         <DialogTitle className="text-center">Please Select a Contact</DialogTitle>
                         <DialogDescription></DialogDescription>
