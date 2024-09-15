@@ -101,7 +101,7 @@ const Profile = () => {
 
     return (
         <div className="bg-[#1b1c24] h-[100vh] flex items-center justify-center flex-col gap-10">
-            <div className="flex flex-col gap-10 w-[80vw] md:w-max ">
+            <div className="flex flex-col gap-10 w-[95vw] md:w-max">
                 <div className="gap-5 flex flex-col">
                     <IoArrowBack onClick={() => navigate('/chat')} className="text-4xl lg:text-6xl text-white/90 cursor-pointer" />
                     <div className="grid grid-cols-2">
@@ -141,7 +141,7 @@ const Profile = () => {
                                 accept=".jpg, .png, .jpeg, .svg, .webp"
                             />
                         </div>
-                        <div className="flex min-w-32 md:min-w-64 flex-col gap-5 text-white items-center justify-center">
+                        <div className="flex min-w-32 md:min-w-64 flex-col gap-3 md:gap-5 text-white items-center justify-center">
                             <div className="w-full">
                                 <Input
                                     placeholder="Email"
@@ -169,7 +169,7 @@ const Profile = () => {
                                     className="rounded-lg p-4 bg-[#2c2e3b] border-none"
                                 />
                             </div>
-                            <div className="w-full flex gap-5">
+                            <div className="w-full flex gap-2 justify-around md:justify-normal md:gap-5">
                                 {
                                     colors.map((color, index) =>
                                     (<div className={`${color} w-8 h-8 rounded-full cursor-pointer transition-all duration-300 
@@ -185,7 +185,7 @@ const Profile = () => {
                         </div>
                     </div>
                     <div className="w-full">
-                        <Button className="h-16 w-full bg-purple-700 hover:bg-purple-900 cursor-pointer transition-all duration-300"
+                        <Button className="h-12 md:h-16 w-full bg-purple-700 hover:bg-purple-900 cursor-pointer transition-all duration-300"
                             onClick={saveChanges}
                         >
                             Save Changes

@@ -115,11 +115,11 @@ const MessageBar = () => {
     }
 
     return (
-        <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-6">
-            <div className="flex flex-1 bg-[#2a2b33] rounded-md items-center gap-5 pr-5">
+        <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-2 md:px-8 mb-3 md:mb-6 gap-2 md:gap-6">
+            <div className="flex flex-1 bg-[#2a2b33] rounded-md items-center  gap-2 md:gap-5 pr-2 md:pr-5">
                 <input
                     type="text"
-                    className="flex-1 p-5 bg-transparent rounded-md focus:border-none focus:outline-none"
+                    className="flex-1  p-4 md:p-5 bg-transparent rounded-md focus:border-none focus:outline-none"
                     placeholder="Enter Message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}

@@ -45,37 +45,48 @@ const Auth = () => {
     }
     const handleLogin = async () => {
         if (validateLogin()) {
-            const responce = await apiClient.post(
-                LOGIN_ROUTE,
-                { email, password },
-                { withCredentials: true }
-            );
-            if (responce.data.user.id) {
-                setUserInfo(responce.data.user)
-                if (responce.data.user.profileSetup) navigate('/chat')
-                else navigate('/profile')
+            try {
+                const response = await apiClient.post(
+                    LOGIN_ROUTE,
+                    { email, password },
+                    { withCredentials: true }
+                );
+
+                if (response.data.user.id) {
+                    setUserInfo(response.data.user)
+                    if (response.data.user.profileSetup) navigate('/chat')
+                    else navigate('/profile')
+                }
+                console.log(response)
+            } catch (error) {
+                toast.error(error.response.data.error || error.response.data)
+                console.log(error)
             }
-            console.log(responce)
         }
     }
     const handleSignup = async () => {
         if (validateSignup()) {
-            const responce = await apiClient.post(
-                SIGNUP_ROUTE,
-                { email, password },
-                { withCredentials: true }
-            );
-            if (responce.status === 201) {
-                setUserInfo(responce.data.user)
-                navigate('/profile')
+            try {
+                const response = await apiClient.post(
+                    SIGNUP_ROUTE,
+                    { email, password },
+                    { withCredentials: true }
+                );
+                if (response.status === 201) {
+                    setUserInfo(response.data.user)
+                    navigate('/profile')
+                }
+                console.log(response)
+            } catch (error) {
+                toast.error(error.response.data.error || error.response.data)
+                console.log(error)
             }
-            console.log(responce)
         }
     }
 
     return (
         <div className="h-[100vh] w-[100vw] flex justify-center items-center">
-            <div className="h-[90vh] w-[80vw] p-5 bg-white border-2 border-white shadow-2xl md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-2xl grid xl:grid-cols-2 ">
+            <div className="h-[90vh] w-[95vw] md:w-{80vw} p-3 md:p-5 bg-white border-2 border-white shadow-2xl md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-2xl grid xl:grid-cols-2">
                 <div className="flex flex-col gap-10 items-center justify-center">
                     <div className="flex items-center flex-col justify-center">
                         <div className="flex items-center justify-center">
@@ -87,7 +98,7 @@ const Auth = () => {
                         </p>
                     </div>
                     <div className="flex items-center justify-center w-full">
-                        <Tabs defaultValue="login" className="w-3/4">
+                        <Tabs defaultValue="login" className="w-[90%] md:w-3/4">
                             <TabsList className="w-full rounded-none bg-transparent">
                                 <TabsTrigger value="login"
                                     className="data-[state=active]:bg-transparent text-black opacity-90 rounded-none border-b-2 w-full data-[state=active]:text-black data-[state=active]:border-b-purple-500 data-[state=active]:font-semibold p-3 transition-all duration-300"

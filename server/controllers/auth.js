@@ -1,25 +1,30 @@
-import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { compare } from "bcrypt";
-import { renameSync, unlinkSync } from 'fs'
+import { existsSync, renameSync, unlinkSync } from 'fs'
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
-const createToken = (email, userId) => {
-    return jwt.sign({ email, userId }, process.env.JWT_KEY, { expiresIn: maxAge })
-};
 
 export const signup = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         if (!email || !password)
             return res.status(400).send("Email and Password Required.")
+
         const user = await User.create({ email, password })
-        res.cookie("jwt", createToken(email, user._id), {
-            maxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Set to true in production
-            sameSite: 'None',
-        });
+
+        const token = await User.matchPasswordAndGenerateToken(email, password);
+
+        if (token.error) return res.status(404).send(token.error)
+
+        const payload = process.env.ORIGIN === "http://localhost:5173"
+            ? { maxAge, secure: true, sameSite: "None" }
+            : {
+                maxAge, httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Set to true in production
+                sameSite: 'None',
+            }
+
+        res.cookie("jwt", token, payload);
+
         return await res.status(201).json({
             user: {
                 id: user._id,
@@ -27,6 +32,7 @@ export const signup = async (req, res, next) => {
                 profileSetup: user.profileSetup,
             }
         })
+
     } catch (error) {
         console.log({ error })
         return res.status(500).send("Internal Server Error");
@@ -36,23 +42,29 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+
         if (!email || !password)
             return res.status(400).send("Email and Password Required.")
 
-        const user = await User.findOne({ email })
-        if (!user)
-            return res.status(404).send("User not Found with given credentials")
+        const user = await User.findOne({ email });
 
-        const auth = compare(password, user.password)
-        if (!auth)
-            return res.status(400).send("Password Incorrect.")
+        if (!user) {
+            return res.status(404).send("User not Found.")
+        }
 
-        res.cookie("jwt", createToken(email, user._id), {
-            maxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Set to true in production
-            sameSite: 'None',
-        });
+        const token = await User.matchPasswordAndGenerateToken(email, password);
+
+        if (token.error) return res.status(404).send({ error: token.error })
+
+        const payload = process.env.ORIGIN === "http://localhost:5173"
+            ? { maxAge, secure: true, sameSite: "None" }
+            : {
+                maxAge, httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Set to true in production
+                sameSite: 'None',
+            }
+
+        res.cookie("jwt", token, payload);
 
         return await res.status(200).json({
             user: {
@@ -65,6 +77,7 @@ export const login = async (req, res, next) => {
                 color: user.color,
             }
         })
+
     } catch (error) {
         console.log({ error })
         return res.status(500).send("Internal Server Error");
@@ -149,19 +162,28 @@ export const addProfileImage = async (req, res, next) => {
 
 export const reomveProfileImage = async (req, res, next) => {
     try {
-        const { userId } = req
+        const { userId } = req;
         const user = await User.findById(userId);
+
         if (!user) {
-            return res.status(404).send("User not found")
+            return res.status(404).send("User not found");
         }
+
+        // Check if the image exists in the file system or not
+        if (user.image && existsSync(user.image)) {
+            unlinkSync(user.image); // Remove the file if it exists
+        }
+
+        // If the image does not exist, remove the reference from the database anyway
         if (user.image) {
-            unlinkSync(user.image)
+            user.image = null;
+            await user.save();
+            return res.status(200).send("Profile Image Deleted Successfully.");
         }
-        user.image = null;
-        await user.save();
-        return res.status(200).send("Profile Image Deleted SuccessFully.")
+
+        return res.status(400).send("No profile image found.");
     } catch (error) {
-        console.log({ error })
+        console.log({ error });
         return res.status(500).send("Internal Server Error");
     }
 }
