@@ -3,6 +3,7 @@ export const createChatSlice = (set, get) => ({
     selectedChatData: undefined,
     selectedChatMessages: [],
     directMessagesContacts: [],
+    directMessagesContactsLiveStatus: [],
     isUploading: false,
     isDownloading: false,
     fileUploadProgress: 0,
@@ -17,6 +18,7 @@ export const createChatSlice = (set, get) => ({
     setSelectedChatData: (selectedChatData) => set({ selectedChatData }),
     setSelectedChatMessages: (selectedChatMessages) => set({ selectedChatMessages }),
     setDirectMessagesContacts: (directMessagesContacts) => set({ directMessagesContacts }),
+    setDirectMessagesContactsLiveStatus: (directMessagesContactsLiveStatus) => set({ directMessagesContactsLiveStatus }),
     closeChat: () => set({
         selectedChatData: undefined,
         selectedChatType: undefined,
@@ -70,5 +72,15 @@ export const createChatSlice = (set, get) => ({
             dmContacts.unshift(fromData)
         }
         set({ directMessagesContacts: dmContacts });
+    },
+    removeContactFromLiveContactList: (contact) => {
+        const liveContacts = get().directMessagesContactsLiveStatus;
+        const newLiveList = liveContacts?.filter((liveContact) => liveContact !== contact)
+        set({ directMessagesContactsLiveStatus: newLiveList });
+    },
+    addContactInLiveContactList: (contact) => {
+        const liveContacts = get().directMessagesContactsLiveStatus;
+        set({ directMessagesContactsLiveStatus: [contact, ...liveContacts] });
+        console.log(liveContacts)
     },
 });

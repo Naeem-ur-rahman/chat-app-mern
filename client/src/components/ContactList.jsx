@@ -5,7 +5,9 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
 const ContactList = ({ contacts, isChannel = false }) => {
 
-    const { selectedChatData, setSelectedChatType, setSelectedChatData, setSelectedChatMessages } = useAppStore()
+    const { selectedChatData, setSelectedChatType, setSelectedChatData, setSelectedChatMessages,
+        directMessagesContactsLiveStatus,
+    } = useAppStore()
 
     const handleClick = (contact) => {
         if (isChannel) setSelectedChatType('channel')
@@ -33,7 +35,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
                         <div className="flex gap-5 items-center justify-start text-neutral-300">
                             {
                                 !isChannel && (
-                                    <Avatar className="w-10 h-10 rounded-full overflow-hidden">
+                                    <Avatar className="w-10 h-10 rounded-full relative">
                                         {
                                             contact.image ?
                                                 <AvatarImage src={`${HOST}/${contact.image}`} alt="Profile" className="object-cover h-full w-full rounded-full bg-black" />
@@ -50,6 +52,7 @@ const ContactList = ({ contacts, isChannel = false }) => {
                                                     }
                                                 </div>
                                         }
+                                        <div className={`h-[10px] w-[10px] ${directMessagesContactsLiveStatus?.includes(contact._id) ? "bg-green-600" : "bg-red-600 "} rounded-3xl absolute right-0 bottom-0`}></div>
                                     </Avatar>
                                 )
                             }

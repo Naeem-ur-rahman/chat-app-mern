@@ -5,7 +5,7 @@ import { HOST } from '@/utils/constants';
 import { RiCloseFill } from 'react-icons/ri'
 
 const ChatHeader = () => {
-    const { closeChat, selectedChatData, selectedChatType } = useAppStore();
+    const { closeChat, selectedChatData, selectedChatType, directMessagesContactsLiveStatus } = useAppStore();
     return (
         <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-5 md:px-20">
             <div className="flex gap-5 items-center">
@@ -13,7 +13,7 @@ const ChatHeader = () => {
                     <div className="w-12 h-12 relative">
                         {
                             selectedChatType === 'contact'
-                                ? <Avatar className="w-12 h-12">
+                                ? <Avatar className="w-12 h-12 rounded relative">
                                     {
                                         selectedChatData.image ?
                                             <AvatarImage src={`${HOST}/${selectedChatData.image}`} alt="Profile" className="object-cover h-full w-full rounded-full bg-black" />
@@ -28,6 +28,7 @@ const ChatHeader = () => {
                                                 }
                                             </div>
                                     }
+                                    <div className={`h-[12px] w-[12px] ${directMessagesContactsLiveStatus?.includes(selectedChatData._id) ? "bg-green-600" : "bg-red-600 "} rounded-3xl absolute right-0 bottom-0`}></div>
                                 </Avatar>
                                 : <div className="bg-[#ffffff22] h-12 w-12 flex items-center justify-center rounded-full">#</div>
                         }

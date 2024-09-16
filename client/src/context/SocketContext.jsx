@@ -63,9 +63,26 @@ export const SocketProvider = ({ children }) => {
                 }
             }
 
+            const handleReceiveContactsLiveStatus = (message) => {
+                const { setDirectMessagesContactsLiveStatus } = useAppStore.getState();
+                setDirectMessagesContactsLiveStatus(message)
+            }
+            
+            const handleDisconnectContact = (message) => {
+                const { removeContactFromLiveContactList } = useAppStore.getState();
+                removeContactFromLiveContactList(message)
+            }
+
+            const handleConnectContact = (message) => {
+                const { addContactInLiveContactList } = useAppStore.getState();
+                addContactInLiveContactList(message)
+            }
+
             socket.current.on("receiveMessage", handleReceiveMessage);
             socket.current.on("receive-channel-message", handleReceiveChannelMessage);
-
+            socket.current.on("receive-contacts-live-status", handleReceiveContactsLiveStatus)
+            socket.current.on("receive-disconnected-contact", handleDisconnectContact);
+            socket.current.on("receive-connected-contact", handleConnectContact);
             return () => {
                 socket.current.disconnect();
                 console.log("Socket connection closed");

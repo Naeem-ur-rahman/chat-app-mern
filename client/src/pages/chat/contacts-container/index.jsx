@@ -7,30 +7,50 @@ import { useAppStore } from "@/store";
 import "@/assets/scrollbar.css"
 import ContactList from "@/components/ContactList";
 import CreateChannel from "./components/create-channel";
+import { useSocket } from "@/context/SocketContext";
 
 const ContactsContainer = () => {
 
-    const { setDirectMessagesContacts, directMessagesContacts, channels, setChannels } = useAppStore();
+    const { setDirectMessagesContacts, directMessagesContacts, channels, setChannels, userInfo } = useAppStore();
+    const socket = useSocket();
 
     useEffect(() => {
         const getContacts = async () => {
-            const response = await apiClient.get(GET_CONTACTS_DM_ROUTE, { withCredentials: true })
-            if (response.status === 200 && response.data.contacts) {
-                setDirectMessagesContacts(response.data.contacts)
+            try {
+                const response = await apiClient.get(GET_CONTACTS_DM_ROUTE, { withCredentials: true });
+                if (response.status === 200 && response.data.contacts) {
+                    setDirectMessagesContacts(response.data.contacts);
+                }
+            } catch (error) {
+                console.error("Error fetching contacts:", error);
             }
         };
-
+    
         const getChannels = async () => {
-            const response = await apiClient.get(GET_USER_CHANNELS_ROUTE, { withCredentials: true });
-            if (response.status === 200 && response.data.channels) {
-                setChannels(response.data.channels);
+            try {
+                const response = await apiClient.get(GET_USER_CHANNELS_ROUTE, { withCredentials: true });
+                if (response.status === 200 && response.data.channels) {
+                    setChannels(response.data.channels);
+                }
+            } catch (error) {
+                console.error("Error fetching channels:", error);
             }
-        }
-
+        };
+    
         getContacts();
         getChannels();
-
-    }, [setChannels,setDirectMessagesContacts]);
+        
+    }, [setChannels, setDirectMessagesContacts, socket, userInfo.id]);
+    
+    // Separate useEffect to handle socket emit when directMessagesContacts updates
+    useEffect(() => {
+        if (socket && directMessagesContacts.length > 0) {
+            socket.emit("send-contacts-for-live-status", {
+                contacts: directMessagesContacts.map((contact) => contact._id),
+                user: userInfo.id,
+            });
+        }
+    }, [socket, directMessagesContacts, userInfo.id]);
 
     return (
         <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full ">

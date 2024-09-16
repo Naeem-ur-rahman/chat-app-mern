@@ -98,6 +98,59 @@ export const getContactsForDMList = async (req, res, next) => {
     }
 }
 
+// For socket.io file to get the user connected or disconnected DM Lists
+export const getDMContacts = async (userId) => {
+    try {
+        userId = new mongoose.Types.ObjectId(userId);
+
+        const contacts = await Message.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { sender: userId },
+                        { recipient: userId },
+                    ],
+                },
+            },
+            {
+                $sort: { timestamp: -1 },
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: {
+                            if: { $eq: ["$sender", userId] },
+                            then: "$recipient",
+                            else: "$sender",
+                        },
+                    },
+                    lastMessageTime: { $first: "$timestamp" },
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "contactInfo",
+                },
+            },
+            {
+                $unwind: "$contactInfo",
+            },
+            {
+                $project: {
+                    _id: 1,
+                },
+            },
+        ])
+        return contacts
+    } catch (error) {
+        console.log({ error })
+        return res.status(500).send("Internal Server Error");
+    }
+}
+
 
 export const getAllContacts = async (req, res, next) => {
     try {

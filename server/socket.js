@@ -1,6 +1,7 @@
 import { Server as SocketIOServer } from 'socket.io'
 import Message from './models/messages.js';
 import Channel from './models/channels.js';
+import { getDMContacts } from './controllers/contacts.js';
 const setupSocket = (server) => {
     const io = new SocketIOServer(server, {
         cors: {
@@ -14,13 +15,40 @@ const setupSocket = (server) => {
 
     const disconnect = (socket) => {
         console.log(`Client Disconnected: ${socket.id}`);
+        let disconnectUser;
         for (const [userId, socketId] of userSocketMap.entries()) {
             if (socketId === socket.id) {
+                disconnectUser = userId
                 userSocketMap.delete(userId);
                 break;
             }
         }
+        // send the user disconnected status to its all dm contacts. 
+        handleReceiveDisconnectedOrConnectContact(disconnectUser, "receive-disconnected-contact")
     }
+
+    const handleReceiveDisconnectedOrConnectContact = async (user, emitRequest) => {
+        const contacts = await getDMContacts(user)
+        contacts.map((contact) => {
+            if (userSocketMap.has(contact._id.toString())) {
+                const socketId = userSocketMap.get(contact._id.toString());
+                io.to(socketId).emit(emitRequest, user)
+            }
+        })
+    }
+
+    const sendLiveStatus = async (message) => {
+        const senderSocketID = userSocketMap.get(message.user);
+        const messageData = []
+        message.contacts.forEach((contact) => {
+            if (userSocketMap.has(contact)) messageData.push(contact)
+        })
+
+        if (senderSocketID) {
+            // send the user its live contacts after getting the resquest from the frontend with its contact list then find the live users from the userSocketMap. 
+            io.to(senderSocketID).emit("receive-contacts-live-status", messageData)
+        }
+    };
 
     const sendMessage = async (message) => {
         const senderSocketID = userSocketMap.get(message.sender);
@@ -81,6 +109,8 @@ const setupSocket = (server) => {
         if (userId) {
             userSocketMap.set(userId, socket.id);
             console.log(`User Connected: ${userId} with SocketId: ${socket.id}`)
+            // send the connected user as a live status to its contacts. 
+            handleReceiveDisconnectedOrConnectContact(userId, "receive-connected-contact")
         } else {
             console.log("UserId not provided during connection!")
         }
@@ -89,6 +119,7 @@ const setupSocket = (server) => {
 
         socket.on("sendMessage", sendMessage)
         socket.on("send-channel-message", sendChannelMessage)
+        socket.on("send-contacts-for-live-status", sendLiveStatus)
     })
 
 };

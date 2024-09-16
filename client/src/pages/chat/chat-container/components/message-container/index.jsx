@@ -24,6 +24,7 @@ const MessageContainer = () => {
 
     useEffect(() => {
         const getMessages = async () => {
+            setSelectedChatMessages([]);
             try {
                 const responce = await apiClient.post(GET_ALL_MESSAGES_ROUTE,
                     { id: selectedChatData._id },
@@ -37,6 +38,7 @@ const MessageContainer = () => {
             }
         }
         const getChannelMessages = async () => {
+            setSelectedChatMessages([]);
             try {
                 const responce = await apiClient.get(
                     `${GET_CHANNEL_MESSAGES_ROUTE}/${selectedChatData._id}`,
@@ -130,7 +132,7 @@ const MessageContainer = () => {
                 <div className={`${message.sender !== selectedChatData._id
                     ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                     : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                    } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words`}>
+                    } border inline-block p-2 md:p-4 rounded my-1 max-w-[70%] md:max-w-[50%] break-words`}>
                     {message.content}
                 </div>
             )}
@@ -139,7 +141,7 @@ const MessageContainer = () => {
                     <div className={`${message.sender !== selectedChatData._id
                         ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                         : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words`}>
+                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[70%] md:max-w-[50%] break-words`}>
                         {
                             checkIfImage(message.fileUrl)
                                 ? (<div
@@ -181,7 +183,7 @@ const MessageContainer = () => {
                     <div className={`${message.sender._id === userInfo.id
                         ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                         : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
+                        } border inline-block p-2 md:p-4 rounded my-1 max-w-[70%] md:max-w-[50%] break-words ml-10`}>
                         {message.content}
                     </div>
                 )}
@@ -191,7 +193,7 @@ const MessageContainer = () => {
                         <div className={`${message.sender._id === userInfo.id
                             ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]"
                             : "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-                            } border inline-block p-2 md:p-4 rounded my-1 max-w-[50%] break-words ml-10`}>
+                            } border inline-block p-2 md:p-4 rounded my-1 max-w-[70%] md:max-w-[50%] break-words ml-10`}>
                             {
                                 checkIfImage(message.fileUrl)
                                     ? (<div
@@ -255,7 +257,7 @@ const MessageContainer = () => {
 
     return (
         <div className="
-        flex-1 overflow-y-auto p-4 px-2 md:px-8 md:w-[65vw] lg:w[70vw] xl:w-[80vw] w-full
+        flex-1 p-4 px-2 overflow-y-auto md:px-8 md:w-[65vw] lg:w[70vw] xl:w-[80vw] w-full
         scrollbar
         "
         >
