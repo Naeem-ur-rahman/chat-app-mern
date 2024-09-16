@@ -1,10 +1,10 @@
 import { apiClient } from "@/lib/api-client";
 import { useAppStore } from "@/store";
-import { GET_ALL_MESSAGES_ROUTE, GET_CHANNEL_MESSAGES_ROUTE, HOST } from "@/utils/constants";
+import { GET_ALL_MESSAGES_ROUTE, GET_CHANNEL_MESSAGES_ROUTE, HOST, REMOVE_FILE_ROUTE } from "@/utils/constants";
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import "@/assets/scrollbar.css";
-import { MdFolderZip } from 'react-icons/md';
+import { MdDelete, MdFolderZip } from 'react-icons/md';
 import { IoMdArrowRoundDown } from 'react-icons/io';
 import { IoCloseSharp } from "react-icons/io5";
 import { toast } from "sonner";
@@ -18,9 +18,11 @@ const MessageContainer = () => {
         setIsDownloading,
         setFileDownloadProgress,
         userInfo,
+        removeMessage,
     } = useAppStore()
     const [showImage, setShowImage] = useState(false);
     const [imageURL, setImageURL] = useState(null);
+    const [imageMessageId, setImageMessageId] = useState(null);
 
     useEffect(() => {
         const getMessages = async () => {
@@ -65,6 +67,22 @@ const MessageContainer = () => {
             scrollRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [selectedChatMessages])
+
+    const deleteFileMessage = async (messageId) => {
+        try {
+            console.log(messageId)
+            const response = await apiClient.delete(REMOVE_FILE_ROUTE, {
+                data: { messageId },
+                withCredentials: true
+            });
+
+            if (response.status === 200) {
+                removeMessage(messageId);
+            }
+        } catch (error) {
+            console.log("Error while Delete File", error);
+        }
+    }
 
     const renderMessages = () => {
         let lastDate = null;
@@ -148,12 +166,13 @@ const MessageContainer = () => {
                                     className="cursor-pointer"
                                     onClick={() => {
                                         setShowImage(true)
+                                        setImageMessageId(message._id)
                                         setImageURL(message.fileUrl)
                                     }}
                                 >
                                     <img src={`${HOST}/${message.fileUrl}`} width={300} height={300} />
                                 </div>)
-                                : (<div className="flex items-center justify-center gap-4">
+                                : (<div className="flex items-center justify-center gap-2 md:gap-4">
                                     <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
                                         <MdFolderZip />
                                     </span>
@@ -162,6 +181,11 @@ const MessageContainer = () => {
                                         onClick={() => downloadFile(message.fileUrl)}
                                     >
                                         <IoMdArrowRoundDown />
+                                    </span>
+                                    <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                                        onClick={() => deleteFileMessage(message._id)}
+                                    >
+                                        <MdDelete />
                                     </span>
                                 </div>)
                         }
@@ -200,12 +224,13 @@ const MessageContainer = () => {
                                         className="cursor-pointer"
                                         onClick={() => {
                                             setShowImage(true)
+                                            setImageMessageId(message._id)
                                             setImageURL(message.fileUrl)
                                         }}
                                     >
                                         <img src={`${HOST}/${message.fileUrl}`} width={300} height={300} />
                                     </div>)
-                                    : (<div className="flex items-center justify-center gap-4">
+                                    : (<div className="flex items-center justify-center gap-2 md:gap-4">
                                         <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
                                             <MdFolderZip />
                                         </span>
@@ -214,6 +239,11 @@ const MessageContainer = () => {
                                             onClick={() => downloadFile(message.fileUrl)}
                                         >
                                             <IoMdArrowRoundDown />
+                                        </span>
+                                        <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                                            onClick={() => deleteFileMessage(message._id)}
+                                        >
+                                            <MdDelete />
                                         </span>
                                     </div>)
                             }
@@ -273,14 +303,28 @@ const MessageContainer = () => {
                     <div className="flex gap-5 fixed top-0 mt-2">
                         <button
                             className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+                            onClick={() => {
+                                deleteFileMessage(imageMessageId)
+                                setShowImage(false);
+                                setImageMessageId(null)
+                                setImageURL(null)
+                            }}
+                        >
+                            <MdDelete />
+                        </button>
+
+                        <button
+                            className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
                             onClick={() => downloadFile(imageURL)}
                         >
                             <IoMdArrowRoundDown />
                         </button>
+
                         <button
                             className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
                             onClick={() => {
                                 setShowImage(false);
+                                setImageMessageId(null)
                                 setImageURL(null)
                             }}
                         >
