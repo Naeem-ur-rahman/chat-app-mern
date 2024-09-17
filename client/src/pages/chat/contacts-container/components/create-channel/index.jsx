@@ -24,7 +24,7 @@ import MultipleSelector from "@/components/ui/multipleselect";
 
 const CreateChannel = () => {
     const [openNewChannelModal, setOpenNewChannelModal] = useState(false);
-    const { setSelectedChatType, setSelectedChatData, addChannel } = useAppStore();
+    const { addChannel } = useAppStore();
     const [allContacts, setAllContacts] = useState([]);
     const [selectedContacts, setSelectedContacts] = useState([]);
     const [channelName, setChannelName] = useState("");
@@ -65,6 +65,17 @@ const CreateChannel = () => {
         }
     }
 
+    const handleSearch = (searchTerm) => {
+        // Filter contacts based on the search term.
+        if (searchTerm === "") {
+            return allContacts; // return full list when search term is empty.
+        }
+        return allContacts.filter((contact) =>
+            contact.label.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+
     return (
         <>
             <TooltipProvider>
@@ -100,6 +111,7 @@ const CreateChannel = () => {
                             placeholder="Search Contacts"
                             value={selectedContacts}
                             onChange={setSelectedContacts}
+                            onSearch={handleSearch}
                             emptyIndicator={
                                 <p className="text-center text-lg leading-10 text-green-600">No results found</p>
                             }

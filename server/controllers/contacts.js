@@ -160,7 +160,7 @@ export const getAllContacts = async (req, res, next) => {
         )
 
         const contacts = users.map((user) => ({
-            label: user.firstName ? `${user.firstName} ${user.lastName}` : email,
+            label: user.firstName ? `${user.firstName} ${user.lastName}` : user.email,
             value: user._id,
         }))
 
