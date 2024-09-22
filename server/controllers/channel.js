@@ -22,7 +22,12 @@ export const createChannel = async (req, res, next) => {
         })
 
         await newChannel.save();
-        return res.status(201).json({ channel: newChannel });
+
+        const populatedChannel = await Channel.findById(newChannel._id)
+            .populate("admin", "_id firstName lastName email color image")
+            .populate("members", "_id firstName lastName email color image");
+
+        return res.status(201).json({ channel: populatedChannel });
 
     } catch (error) {
         console.log({ error })
@@ -37,7 +42,10 @@ export const getUserChannels = async (req, res, next) => {
 
         const channels = await Channel.find({
             $or: [{ admin: userId }, { members: userId }],
-        }).sort({ updatedAt: -1 });
+        })
+            .populate("admin", "_id firstName lastName email color image")
+            .populate("members", "_id firstName lastName email color image")
+            .sort({ updatedAt: -1 });
 
         return res.status(200).json({ channels });
 
